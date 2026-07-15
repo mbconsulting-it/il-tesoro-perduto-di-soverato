@@ -1,0 +1,70 @@
+IL TESORO PERDUTO DI SOVERATO — FLIPBOOK SFOGLIABILE PER IL WEB
+================================================================
+
+COSA C'È IN QUESTA CARTELLA
+---------------------------
+index.html ........................... la pagina del flipbook (il file principale)
+pageflip.js .......................... la libreria per l'effetto sfoglia-pagina
+pages/ ............................... le 56 pagine del libro come immagini WebP
+musica.mp3 ........................... la musica di sottofondo (in loop)
+il-tesoro-perduto-di-soverato.pdf .... il PDF originale (per il pulsante "Scarica")
+
+COME METTERLO SUL TUO SITO
+--------------------------
+1. Carica TUTTA la cartella (con la stessa struttura) sul tuo hosting,
+   via FTP o dal pannello di controllo (cPanel, Plesk, ecc.).
+   Esempio: caricala come cartella "flipbook" nella root del sito.
+
+2. Il flipbook sarà subito visibile all'indirizzo:
+   https://www.tuosito.it/flipbook/
+   (oppure https://www.tuosito.it/flipbook/index.html)
+
+Non serve nessun database, nessun PHP: sono solo file statici.
+Funziona anche su hosting gratuiti come Netlify, GitHub Pages, Cloudflare Pages.
+
+COME INCORPORARLO IN UNA PAGINA GIÀ ESISTENTE
+---------------------------------------------
+Inserisci questo codice dove vuoi che appaia il libro:
+
+<iframe src="https://www.tuosito.it/flipbook/"
+        style="width:100%; height:80vh; border:none; border-radius:12px;"
+        allowfullscreen title="Il Tesoro Perduto di Soverato"></iframe>
+
+(sostituisci l'indirizzo con quello reale del tuo sito)
+
+COME SI USA
+-----------
+- Trascina l'angolo delle pagine con il mouse o con il dito (su smartphone)
+- Frecce della tastiera: ← → per sfogliare, Home/Fine per inizio/fine
+- Pulsanti in basso: prima pagina, indietro, avanti, ultima pagina,
+  schermo intero, scarica il PDF
+- Su schermi larghi mostra la doppia pagina come un libro aperto,
+  su smartphone mostra una pagina alla volta
+
+MUSICA
+------
+- La musica parte in loop al primo clic o tocco sulla pagina
+  (i browser non permettono l'audio automatico prima di un'interazione).
+- Il pulsante con la nota musicale in basso la accende e la spegne.
+- Per cambiare brano basta sostituire il file musica.mp3 con un altro mp3
+  con lo stesso nome.
+
+STATISTICHE (VISITE E DOWNLOAD)
+-------------------------------
+- Il flipbook usa GoatCounter: ogni visita alla pagina viene contata,
+  e ogni clic sul pulsante "Scarica il PDF" viene registrato
+  come evento "scarica-pdf".
+- Per vedere le statistiche vai su:
+  https://iltesoroperdutodisoverato.goatcounter.com
+  ed entra con la tua email e password.
+- Le visite vengono contate solo quando il flipbook è online
+  (non aprendo il file dal computer).
+
+NOTE
+----
+- Dopo la copertina c'è una pagina bianca: serve a mantenere ogni pagina
+  del libro sul lato giusto, come nella versione stampata.
+- L'ultima pagina del PDF originale era bianca ed è stata esclusa.
+- Le immagini si caricano man mano che si sfoglia, quindi la pagina si apre veloce.
+- Se non vuoi il pulsante di download del PDF, puoi cancellare il file PDF
+  e rimuovere il pulsante con id="btnDl" da index.html.

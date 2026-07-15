@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Il Tesoro Perduto di Soverato — Sfoglia il libro</title>
+<meta name="description" content="Il Tesoro Perduto di Soverato — una caccia al tesoro da leggere, colorare e vivere. Sfoglia il libro online.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg1: #0b2545;
+    --bg2: #13315c;
+    --accent: #f4a825;
+    --toolbar-h: 64px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: radial-gradient(ellipse at 50% 30%, var(--bg2) 0%, var(--bg1) 70%);
+  }
+  #stage {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    bottom: var(--toolbar-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+  }
+  #book { touch-action: pan-y; transition: transform .7s cubic-bezier(.4,0,.2,1); }
+  /* When the book is closed (cover only, two-page view) the cover sits on the
+     right half: shift the whole book left by a quarter to center it on screen */
+  #book.at-cover { transform: translateX(-25%); }
+  #book .page {
+    background: #fdf6e3;
+    box-shadow: 0 0 24px rgba(0,0,0,.45);
+    overflow: hidden;
+  }
+  #book .page img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    -webkit-user-drag: none;
+    user-select: none;
+    pointer-events: none;
+  }
+  #book .page.page-blank { background: #ffffff; }
+  .tbtn.music-off svg { opacity: .35; }
+  /* Toolbar */
+  #toolbar {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: var(--toolbar-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: rgba(4, 18, 40, .85);
+    backdrop-filter: blur(6px);
+    border-top: 1px solid rgba(255,255,255,.08);
+    padding: 0 12px;
+  }
+  .tbtn {
+    appearance: none;
+    border: none;
+    background: rgba(255,255,255,.08);
+    color: #fff;
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s, transform .1s;
+  }
+  .tbtn:hover { background: rgba(255,255,255,.18); }
+  .tbtn:active { transform: scale(.94); }
+  .tbtn svg { width: 22px; height: 22px; fill: currentColor; }
+  #pageNum {
+    color: #fff;
+    font-size: 15px;
+    min-width: 86px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .5px;
+  }
+  #pageNum b { color: var(--accent); font-weight: 600; }
+  #title {
+    position: absolute;
+    top: 10px; left: 0; right: 0;
+    text-align: center;
+    color: rgba(255,255,255,.55);
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+  #hint {
+    position: absolute;
+    bottom: calc(var(--toolbar-h) + 10px);
+    left: 0; right: 0;
+    text-align: center;
+    color: rgba(255,255,255,.5);
+    font-size: 13px;
+    pointer-events: none;
+    transition: opacity 1s;
+  }
+  @media (max-height: 500px) {
+    #title, #hint { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="title">Il Tesoro Perduto di Soverato</div>
+
+<div id="stage">
+  <div id="book"></div>
+</div>
+
+<div id="hint">Trascina l'angolo della pagina oppure usa le frecce per sfogliare</div>
+
+<div id="toolbar">
+  <button class="tbtn" id="btnFirst" title="Prima pagina" aria-label="Prima pagina">
+    <svg viewBox="0 0 24 24"><path d="M18.4 5.6 12 12l6.4 6.4L17 19.8 9.2 12 17 4.2zM7 4h2v16H7z"/></svg>
+  </button>
+  <button class="tbtn" id="btnPrev" title="Pagina precedente" aria-label="Pagina precedente">
+    <svg viewBox="0 0 24 24"><path d="M15.4 5.6 9 12l6.4 6.4L14 19.8 6.2 12 14 4.2z"/></svg>
+  </button>
+  <span id="pageNum"><b>1</b> / 57</span>
+  <button class="tbtn" id="btnNext" title="Pagina successiva" aria-label="Pagina successiva">
+    <svg viewBox="0 0 24 24"><path d="M8.6 5.6 15 12l-6.4 6.4L10 19.8 17.8 12 10 4.2z"/></svg>
+  </button>
+  <button class="tbtn" id="btnLast" title="Ultima pagina" aria-label="Ultima pagina">
+    <svg viewBox="0 0 24 24"><path d="M5.6 5.6 12 12l-6.4 6.4L7 19.8 14.8 12 7 4.2zM15 4h2v16h-2z"/></svg>
+  </button>
+  <button class="tbtn" id="btnFs" title="Schermo intero" aria-label="Schermo intero">
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
+  </button>
+  <button class="tbtn" id="btnMusic" title="Musica sì/no" aria-label="Attiva o disattiva la musica">
+    <svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3z"/></svg>
+  </button>
+  <a class="tbtn" id="btnDl" href="il-tesoro-perduto-di-soverato.pdf" download title="Scarica il PDF" aria-label="Scarica il PDF">
+    <svg viewBox="0 0 24 24"><path d="M11 3h2v10.2l3.6-3.6L18 11l-6 6-6-6 1.4-1.4L11 13.2zM4 19h16v2H4z"/></svg>
+  </a>
+</div>
+
+<audio id="bgm" src="musica.mp3" loop preload="auto"></audio>
+
+<!-- Statistiche GoatCounter: conta le visite alla pagina -->
+<script data-goatcounter="https://iltesoroperdutodisoverato.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+<script src="pageflip.js"></script>
+<script>
+(function () {
+  // Sequence: cover, a blank page, then pages 2..56 of the PDF.
+  // The blank page keeps "Un messaggio per te" (and every page after it)
+  // on the right-hand side, like in the printed book.
+  // (Page 57 of the PDF is blank and is omitted.)
+  var SEQ = ['pag-01', null];
+  for (var k = 2; k <= 56; k++) { SEQ.push('pag-' + (k < 10 ? '0' : '') + k); }
+  var TOTAL = SEQ.length;
+  var PAGE_W = 1300, PAGE_H = 900;
+
+  // Build page elements (lazy-loaded images)
+  var book = document.getElementById('book');
+  for (var i = 0; i < TOTAL; i++) {
+    var div = document.createElement('div');
+    div.setAttribute('data-density', i === 0 ? 'hard' : 'soft');
+    if (SEQ[i] === null) {
+      div.className = 'page page-blank';
+    } else {
+      div.className = 'page';
+      var img = document.createElement('img');
+      img.src = 'pages/' + SEQ[i] + '.webp';
+      img.alt = 'Pagina ' + (i + 1);
+      img.loading = (i <= 4) ? 'eager' : 'lazy';
+      img.decoding = 'async';
+      div.appendChild(img);
+    }
+    book.appendChild(div);
+  }
+
+  var pageFlip = new St.PageFlip(book, {
+    width: PAGE_W,
+    height: PAGE_H,
+    size: 'stretch',
+    minWidth: 280,
+    maxWidth: 2200,
+    minHeight: 194,
+    maxHeight: 1524,
+    usePortrait: true,
+    showCover: true,
+    autoSize: true,
+    maxShadowOpacity: 0.35,
+    mobileScrollSupport: true,
+    flippingTime: 800
+  });
+  pageFlip.loadFromHTML(document.querySelectorAll('#book .page'));
+
+  var pageNum = document.getElementById('pageNum');
+  function updateCounter() {
+    var p = Math.min(pageFlip.getCurrentPageIndex() + 1, TOTAL);
+    pageNum.innerHTML = '<b>' + p + '</b> / ' + TOTAL;
+  }
+  pageFlip.on('flip', updateCounter);
+  updateCounter();
+
+  // Center the cover on screen while the book is closed (two-page view only)
+  function updateCoverShift() {
+    var atCover = pageFlip.getCurrentPageIndex() === 0 &&
+                  pageFlip.getOrientation() === 'landscape';
+    book.classList.toggle('at-cover', atCover);
+  }
+  pageFlip.on('flip', updateCoverShift);
+  pageFlip.on('changeOrientation', function () { setTimeout(updateCoverShift, 50); });
+  // Slide back as soon as the user starts turning the cover
+  pageFlip.on('changeState', function (e) {
+    if (e.data !== 'read' && pageFlip.getCurrentPageIndex() === 0) {
+      book.classList.remove('at-cover');
+    } else if (e.data === 'read') {
+      updateCoverShift();
+    }
+  });
+  updateCoverShift();
+
+  document.getElementById('btnPrev').onclick = function () { pageFlip.flipPrev(); };
+  document.getElementById('btnNext').onclick = function () { pageFlip.flipNext(); };
+  document.getElementById('btnFirst').onclick = function () { pageFlip.flip(0); };
+  document.getElementById('btnLast').onclick = function () { pageFlip.flip(TOTAL - 1); };
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { pageFlip.flipNext(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { pageFlip.flipPrev(); }
+    else if (e.key === 'Home') { pageFlip.flip(0); }
+    else if (e.key === 'End') { pageFlip.flip(TOTAL - 1); }
+  });
+
+  // Fullscreen
+  document.getElementById('btnFs').onclick = function () {
+    if (!document.fullscreenElement) {
+      (document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen).call(document.documentElement);
+    } else {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    }
+  };
+
+  // Resize handling: StPageFlip autoSize handles container resize
+  window.addEventListener('resize', function () {
+    if (pageFlip && pageFlip.getUI && pageFlip.getUI()) { pageFlip.getUI().update(); }
+  });
+
+  // Statistiche: registra un evento quando qualcuno scarica il PDF
+  document.getElementById('btnDl').addEventListener('click', function () {
+    if (window.goatcounter && window.goatcounter.count) {
+      window.goatcounter.count({ path: 'scarica-pdf', title: 'Download PDF', event: true });
+    }
+  });
+
+  // Background music (loop). Browsers block autoplay with sound,
+  // so we try right away and otherwise start at the first interaction.
+  var bgm = document.getElementById('bgm');
+  var btnMusic = document.getElementById('btnMusic');
+  var musicWanted = true;
+  bgm.volume = 0.45;
+
+  function syncMusicBtn() {
+    btnMusic.classList.toggle('music-off', bgm.paused);
+  }
+  function tryPlay() {
+    if (!musicWanted) { return; }
+    bgm.play().then(syncMusicBtn).catch(function () { syncMusicBtn(); });
+  }
+  btnMusic.onclick = function () {
+    if (bgm.paused) { musicWanted = true; bgm.play().then(syncMusicBtn).catch(syncMusicBtn); }
+    else { musicWanted = false; bgm.pause(); syncMusicBtn(); }
+  };
+  tryPlay();
+  var startOnGesture = function () {
+    tryPlay();
+    document.removeEventListener('pointerdown', startOnGesture);
+    document.removeEventListener('keydown', startOnGesture);
+  };
+  document.addEventListener('pointerdown', startOnGesture);
+  document.addEventListener('keydown', startOnGesture);
+  syncMusicBtn();
+
+  // Fade the hint after first interaction / 6s
+  var hint = document.getElementById('hint');
+  var hideHint = function () { hint.style.opacity = '0'; };
+  setTimeout(hideHint, 7000);
+  pageFlip.on('flip', hideHint);
+})();
+</script>
+</body>
+</html>
