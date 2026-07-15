@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -32,7 +32,7 @@
     justify-content: center;
     padding: 18px;
   }
-  #book { touch-action: pan-y; transition: transform .7s cubic-bezier(.4,0,.2,1); }
+  #book { touch-action: pan-y pinch-zoom; transition: transform .7s cubic-bezier(.4,0,.2,1); }
   /* When the book is closed (cover only, two-page view) the cover sits on the
      right half: shift the whole book left by a quarter to center it on screen */
   #book.at-cover { transform: translateX(-25%); }
