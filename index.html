@@ -2,7 +2,10 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Il Tesoro Perduto di Soverato — Sfoglia il libro</title>
 <meta name="description" content="Il Tesoro Perduto di Soverato — una caccia al tesoro da leggere, colorare e vivere. Sfoglia il libro online.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
@@ -112,6 +115,12 @@
   @media (max-height: 500px) {
     #title, #hint { display: none; }
   }
+  /* Immersive mode for devices without true fullscreen (iPhone) */
+  body.sim-fs #title, body.sim-fs #hint { display: none; }
+  body.sim-fs { --toolbar-h: 46px; }
+  body.sim-fs #stage { padding: 4px; }
+  body.sim-fs .tbtn { width: 36px; height: 36px; font-size: 16px; }
+  body.sim-fs .tbtn svg { width: 18px; height: 18px; }
 </style>
 </head>
 <body>
@@ -240,14 +249,41 @@
     else if (e.key === 'End') { pageFlip.flip(TOTAL - 1); }
   });
 
-  // Fullscreen
+  // Fullscreen — with fallback for iPhone (iOS Safari does not allow
+  // true fullscreen for web pages: we use an immersive mode instead)
+  var docEl = document.documentElement;
+  var fsSupported = !!(docEl.requestFullscreen || docEl.webkitRequestFullscreen);
+  function fsElement() { return document.fullscreenElement || document.webkitFullscreenElement; }
+  function refreshBook() {
+    setTimeout(function () {
+      if (pageFlip && pageFlip.getUI && pageFlip.getUI()) { pageFlip.getUI().update(); }
+      updateCoverShift();
+    }, 350);
+  }
   document.getElementById('btnFs').onclick = function () {
-    if (!document.fullscreenElement) {
-      (document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen).call(document.documentElement);
+    if (fsSupported) {
+      if (!fsElement()) {
+        (docEl.requestFullscreen || docEl.webkitRequestFullscreen).call(docEl);
+        // On phones, rotate to landscape for a wider book (works on Android)
+        try {
+          if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch(function () {});
+          }
+        } catch (e) {}
+      } else {
+        try { if (screen.orientation && screen.orientation.unlock) { screen.orientation.unlock(); } } catch (e) {}
+        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      }
+      refreshBook();
     } else {
-      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      // iPhone: immersive mode (hide everything except the book)
+      document.body.classList.toggle('sim-fs');
+      window.scrollTo(0, 1);
+      refreshBook();
     }
   };
+  document.addEventListener('fullscreenchange', refreshBook);
+  document.addEventListener('webkitfullscreenchange', refreshBook);
 
   // Resize handling: StPageFlip autoSize handles container resize
   window.addEventListener('resize', function () {
